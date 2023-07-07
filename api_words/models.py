@@ -7,7 +7,7 @@ class Word(models.Model):
     language = models.CharField(max_length=5, verbose_name="Language")
 
     class Meta:
-        managed = False
+#        managed = False
         db_table = 'words'
 
     def __str__(self):
