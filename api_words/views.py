@@ -19,11 +19,9 @@ class WordViewSet(viewsets.ModelViewSet):
 def random_word(request, letters = None):
     queryset = None
     if letters == None:
-        print(29)
         queryset = Word.objects.all()
 
     else:
-        print("26")
         queryset = Word.objects.filter(length=letters)
 
     random_word = random.choice(queryset)
