@@ -13,11 +13,17 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import os
 import environ
+from django.core.exceptions import ImproperlyConfigured
 
 env = environ.Env(DEBUG=(bool, False))
 
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = env.bool("DEBUG", False)
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+#BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+#BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Take environment variables from .env file
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
@@ -25,13 +31,19 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
+def get_env_variable(var_name):
+    try:
+        return os.environ[var_name]
+    except KeyError:
+        error_msg = "set the %s environment variable" % var_name
+        raise ImproperlyConfigured(error_msg)
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('SECRET_KEY')
+#SECRET_KEY = env('SECRET_KEY', default=('insecure' if DEBUG else environ.Env.NOTSET))
+#SECRET_KEY = env('SECRET_KEY')
+SECRET_KEY = get_env_variable('SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -86,7 +98,7 @@ DATABASES = {
 		'ENGINE': 'django.db.backends.postgresql_psycopg2',
 		'NAME': 'words',
 		'USER': env('DB_OWNER'),
-		'PASSWORD': env('DB_PASSWORD'), # La contraseña del usuario postgres
+		'PASSWORD': env('DB_PASSWORD'),
 		'HOST': env('DB_HOST'),
 		'PORT': env('PORT'),
 	}
